@@ -35,7 +35,27 @@ while True:
         if dati=='0':
             print("Chiudo la connessione con " + str(addr_client))
             break
-        dati = "Risposta a : " + str(addr_client) + ". Il valore del contatore è : " + str(contConn)
+
+        ris=0
+        dati=dati.split(';')
+        if dati[0]=='piu':
+            ris=int(dati[1]) + int(dati[2])
+        elif dati[0]=='meno':
+            ris=int(dati[1]) - int(dati[2])
+        elif dati[0]=='per':
+            ris=int(dati[1]) * int(dati[2])
+        elif dati[0]=='diviso':
+            ris=int(dati[1]) / int(dati[2])
+
+        ris=str(ris)
+        
+
+            
+        
+
+
+
+        dati = "Risposta a : " + str(addr_client) + ". Il valore del contatore è : " + str(ris)
 
         dati = dati.encode()
 
