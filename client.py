@@ -11,41 +11,58 @@ print(type(output_string))
 print(output_string)
 
 import socket
+import sys
 
 SERVER_ADDRESS = '127.0.0.1'
 SERVER_PORT = 22224
 
-sock_service = socket.socket()
+#la funzione riceve la socket connessa al server e la utilizza per rchiedere il servizio
+def invia_comandi(sock_service): 
+    while True:
+        try:
+            dati = input("Inserisci i dati da inviare (0 per terminare la connessione): ")
+        except EOFError:
+            print("\nOkay. Exit")
+            break
+                
+        if not dati:
+            print("Non puoi inviare una stringa vuota!")
+            continue
 
-sock_service.connect((SERVER_ADDRESS, SERVER_PORT))
+        if dati == '0':
+            print("Chiudo la connessione con il server!")
+            break
+        
+        dati = dati.encode()
 
-print("Connesso a " + str((SERVER_ADDRESS, SERVER_PORT)))
-while True:
-    try:
-        dati = input("Inserisci i dati da inviare (0 per terminare la connessione): ")
-    except EOFError:
-        print("\nOkay. Exit")
-        break
-    if not dati:
-        print("Non puoi inviare una stringa vuota!")
-        continue
-    if dati == '0':
-        print("Chiudo la connessione con il server!")
-        break
+        sock_service.send(dati)
+
+        dati = sock_service.recv(2048)
+
+        if not dati:
+            print("Server non risponde. Exit")
+            break
+        
+        dati = dati.decode()
+
+        print("Ricevuto dal server:")
+        print(dati + '\n')
+
+        
+
+        sock_service.close()
+        
+#la funzione crea una socket (s) per la connessione con il server e la passa alla funzione invia_comandi(s)
+def connessione_server(address,port):
+    sock_service = socket.socket()  
+    sock_service.connect((SERVER_ADDRESS, SERVER_PORT))
+    print("Connesso a " + str((SERVER_ADDRESS, SERVER_PORT)))
+    invia_comandi(sock_service)
     
-    dati = dati.encode()
 
-    sock_service.send(dati)
+if __name__ == '__main__':
+    connessione_server(SERVER_ADDRESS,SERVER_PORT)
+# if __name__ == '__main__': consente al nostro codice di capire se stia venendo eseguito
+# uno script a se stante, o se invece è stato richiamato come modulo da un qualche 
+#programma per usare una o più delle sue varie funzioni e classi
 
-    dati = sock_service.recv(2048)
-
-    if not dati:
-        print("Server non risponde. Exit")
-        break
-    
-    dati = dati.decode()
-
-    print("Ricevuto dal server:")
-    print(dati + '\n')
-
-sock_service.close()
